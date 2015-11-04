@@ -1,36 +1,20 @@
-# sg-assess-adapt
-An assessment and adaptation module for service-based serious games
+# sg-dashboard
+A dashboard to visualize game data.
 
 ## Requires
 
 sudo apt-get install build-essential libssl-dev libffi-dev python3-dev
 
-
 pip install flask flask-sqlalchemy flask-auth flask-api pyOpenSSL cryptography passlib sqlalchemy-migrate
 
 ## Try it out
 
-First, remember to activate the virtualenv, if any
+First, remember to activate the virtualenv, if any.
  
-Then, create the database and the migration files:
+Run the server:
 
-$ python gameevents/db_create.py
-$ python gameevents/db_migrate.py
+$ python dashboard/run.py
 
-Run the server
+Visit the dashboard: http://localhost:5001/events
 
-$ python gameevents/run.py
-
-Add a client to the database:
-
-$ curl -i -H "Content-Type: application/json" -X POST -d '{"clientid":"lix", "apikey":"lixapikey"}' http://localhost:5000/gameevents/api/v1.0/client
-
-Request a token:
-
-$ curl -i -H "Content-Type: application/json" -X POST -d '{"clientid":"lix","apikey":"lixapikey", "sessionid":"aaaa"}' http://localhost:5000/gameevents/api/v1.0/token
-
-Commit an event:
-$ curl -i -H "Content-Type: application/json" -X POST -d '{"token":"YOURTOKEN","timestamp":"0001","gameevent":"<test></test>"}' http://localhost:5000/gameevents/api/v1.0/commitevent
-
-See events commited in this session:
-$ curl -i -H "Content-Type: application/json" -X POST -d '{"token":"YOURTOKEN"}' http://localhost:5000/gameevents/api/v1.0/events
+See events commited in the test session by filling in the value "aaaa" and clicking in the link.
