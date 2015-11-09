@@ -1,8 +1,9 @@
 <!-- extend base layout -->
 {% extends "base.html" %}
 
-{% block content %}
 
+{% block scripts %}
+{{super()}}
 <script type=text/javascript>
 
 
@@ -22,6 +23,10 @@ function startRefresh() {
 
 			  
 </script>
+
+{%- endblock scripts %}
+
+{% block content %}
 
 <h1>get data for session</h1>
 

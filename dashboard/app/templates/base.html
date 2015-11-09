@@ -1,18 +1,59 @@
-<html>
-	<head>
-	    {% if title %}
-	    <title>{{ title }}</title>
-	    {% else %}
-	    <title>Welcome to dashboard</title>
-	    {% endif %}
-	    <script type=text/javascript>
-	  		$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
-		</script>
-	  	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-	  	<script>window.jQuery || document.write('<script src="{{  url_for('static', filename='jquery-2.1.4.min.js') }}">\x3C/script>')</script>
-	</head>
-  	
-  	<body>
-    	{% block content %}{% endblock %}
-  	</body>
+{% block doc -%}
+<!DOCTYPE html>
+<html{% block html_attribs %}{% endblock html_attribs %}>
+{%- block html %}
+  <head>
+    {%- block head %}
+    <title>{% block title %}{% endblock title %}</title>
+
+    {%- block metas %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {%- endblock metas %}
+
+    {%- block styles %}
+    <!-- Bootstrap -->
+    <link href="{{bootstrap_find_resource('css/bootstrap.css', cdn='bootstrap')}}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='dashboard.css')}}">
+    {%- endblock styles %}
+    
+    {% import "bootstrap/fixes.html" as fixes %}
+    
+    {{fixes.ie8()}}
+    
+    <script type=text/javascript>
+    	$SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    </script>
+    
+    
+    {%- endblock head %}
+  </head>
+  
+  <body{% block body_attribs %}{% endblock body_attribs %}>
+  
+    {% block body -%}
+    <!-- Wrap all page content here -->
+	<div id="wrap">
+	
+    {% block navbar %}
+    
+    Navbar
+    
+    {%- endblock navbar %}
+    {% block content -%}
+    {%- endblock content %}
+
+    {% block scripts %}
+    <script src="{{bootstrap_find_resource('jquery.js', cdn='jquery')}}"></script>
+    <script src="{{bootstrap_find_resource('js/bootstrap.js', cdn='bootstrap')}}"></script>
+    {%- endblock scripts %}
+    
+    
+    </div> <!--/wrap-->
+    {%- endblock body %}
+    
+  </body>
+  
+{%- endblock html %}
 </html>
+{% endblock doc -%}
+
