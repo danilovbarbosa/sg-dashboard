@@ -33,19 +33,19 @@ def index():
         session_result = events_controller.get_sessions()  
         
         count = 0
-        session_list = False
+        session_list = []
         
         if "count" in session_result:
             count = session_result["count"]
         if "results" in session_result:
             session_list = session_result["results"]
 
-        return render_template("index.html", session_list = session_list,
-                           title='Dashboard Home')
+        return render_template("index.html", session_list = session_list, 
+                               count = count, title='Dashboard Home')
     except Exception as e:
         LOG.error(e.args, exc_info=False)
         return render_template("error.html",
-                           title='Error')        
+                           title='Error', error=e.args)        
     
     
 @dashboard.route('/error')
@@ -116,6 +116,11 @@ def events(sessionid):
         #                   title='Error',
         #                   error='Connection error. Is the game events service up?')
         events_list["status"] = "error"
+    except Exception as e:
+        return render_template("error.html",
+                           title='Error',
+                           error=e.args)
+        #events_list["status"] = "error"
 
     #return jsonify(ajax_response) 
     return render_template('events.html', events = events_list, sessionid=sessionid)

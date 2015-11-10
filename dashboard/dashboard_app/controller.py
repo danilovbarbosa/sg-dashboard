@@ -11,6 +11,7 @@ from config import GAMEEVENTS_SERVICE_ENDPOINT, CLIENTID, APIKEY
 
 #Logging
 from logging import getLogger
+from json.decoder import JSONDecodeError
 LOG = getLogger(__name__)
 
 class EventsController:
@@ -21,26 +22,33 @@ class EventsController:
 
     def get_events(self, sessionid):
         try:
-            token = self.get_token(sessionid)
+            token = self.get_token()
             if token:
                 LOG.debug("Sending request for events...")
-                payload = {"token": token}
+                payload = {"token": token, "sessionid": sessionid}
                 url = GAMEEVENTS_SERVICE_ENDPOINT + '/events'
                 response = requests.post(url, json=payload)
                 myresponse = response.json()
+                LOG.debug(myresponse)
                 return(myresponse)
             else:
                 return False
         except RequestException as e:
-            LOG.error(e.args, exc_info=False)
+            LOG.error(e.args, exc_info=True)
+            raise e
+        except JSONDecodeError as e:
+            LOG.error("Returned message is not proper JSON.")
+            return False
+        except Exception as e:
+            LOG.error(e.args, exc_info=True)
             raise e
             #return render_template('error.html', error="Could not process your request, sorry! Reason: %s " % str(e.args))
     
-    def get_token(self, sessionid):
+    def get_token(self):
         if self.token:
             return self.token
         else:
-            payload = {"clientid": CLIENTID, "apikey": APIKEY, "sessionid": sessionid}
+            payload = {"clientid": CLIENTID, "apikey": APIKEY}
             url = GAMEEVENTS_SERVICE_ENDPOINT + '/token'
             LOG.debug("sending request for token...")
             
@@ -55,6 +63,9 @@ class EventsController:
                     else:
                         LOG.debug("Server response: %s " % myresponse["message"])
                         raise Exception("Unknown error when trying to get token.")
+                elif (response.status_code==401):
+                    LOG.debug("Server response: %s " % myresponse["message"])
+                    raise RequestException("Not authorized.")
                 else:
                     if "message" in myresponse:
                         LOG.debug("Server response: %s " % myresponse["message"])
@@ -86,6 +97,9 @@ class EventsController:
                 else:
                     LOG.debug("Server response: %s " % myresponse["message"])
                     raise Exception("Unknown error when trying to get sessions.")
+            elif (response.status_code==401):
+                    LOG.debug("Server response: %s " % myresponse["message"])
+                    raise RequestException("Not authorized.")
             else:
                 if "message" in myresponse:
                     LOG.debug("Server response: code %s, message: %s " % (response.status_code, myresponse["message"]))
