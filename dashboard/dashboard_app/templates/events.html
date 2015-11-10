@@ -8,27 +8,50 @@
 {%- endblock scripts %}
 
 {% block content %}
-  
-	  <table id="overview" border="1">
-		  <thead>
-		    <tr>
-		        <th>Timestamp</th>
-		        <th>Level</th>
-		        <th>Action</th>
-		    </tr>
-		    </thead>
-	    <tbody>
-	    
-	    {% for event in events %}
-		<tr>
-		    <td>{{ event.timestamp }}</td>
-		    <td>{{ event.level }}</td>
-		    <td>{{ event.action }}</td>
-		</tr>
-	  {% endfor %}
-	  
-	    </tbody>
+
+<div class="container">
+
+<div class="row">
+
+	<div class="col-md-12">
 	
-	    </table>
+	<h1>Game Events</h1>
+	
+	<h3>Showing events for session: {{sessionid}}</h3>
+	
+	<br />
+	
+	<button class="btn btn-primary" onClick="history.go(0)" type="button">Refresh page</button>
+
+	<br /> <br />
+	
+	<table id="overview" class="table">
+			  <thead>
+			    <tr>
+			        <th>Timestamp</th>
+			        <th>Level</th>
+			        <th>Action</th>
+			    </tr>
+			    </thead>
+		    <tbody>
+		    
+		    {% for event in events %}
+			<tr>
+			    <td>{{ event.timestamp }}</td>
+			    <td>{{ event.level }}</td>
+			    <td>{{ event.action }}</td>
+			</tr>
+		  {% endfor %}
+		  
+		    </tbody>
+		
+		 </table>
+		 
+	</div><!--/col-md-12-->
+
+</div><!--/row-->
+
+</div><!--/container-->
+
 {% endblock %}
 	    

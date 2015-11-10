@@ -118,7 +118,7 @@ def events(sessionid):
         events_list["status"] = "error"
 
     #return jsonify(ajax_response) 
-    return render_template('events.html', events = events_list)
+    return render_template('events.html', events = events_list, sessionid=sessionid)
 
 
 @dashboard.route('/get_events/<sessionid>', methods = ['GET'])
