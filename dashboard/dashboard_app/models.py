@@ -3,10 +3,10 @@ Models that extend the Model class provided by
 Flask's SQLAlchemy extension (flask.ext.sqlalchemy).
 '''
 
-import uuid, OpenSSL
+#import uuid, OpenSSL
 
-from app import db
-from app import app
+#from dashboard_app import db
+#from dashboard_app import app
 
 #from itsdangerous import (TimedJSONWebSignatureSerializer
 #                          as Serializer, BadSignature, SignatureExpired)

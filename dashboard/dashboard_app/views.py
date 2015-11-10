@@ -3,42 +3,47 @@ Defines the views of the dashboard.
 This defines the interaction points, but the actual logic is treated
 by the :mod:`controller`.
 '''
-from flask import render_template, flash, redirect, url_for
-from flask import Flask, jsonify, request, abort
-from flask import current_app, Blueprint
-from flask.ext.api import status 
-from flask.helpers import make_response
-from app import app, auth
-import datetime
-import json
-import time
+
+from flask import current_app, Blueprint, render_template
+from flask import jsonify
 from lxml import objectify
+
+import datetime
+
 from requests import ConnectionError
 
-from app import controller
+from dashboard_app import controller
 
-@app.route('/')
-@app.route('/index')
+#Logging
+from logging import getLogger
+LOG = getLogger(__name__)
+
+#Blueprint
+dashboard = Blueprint('dashboard', __name__, url_prefix='')
+
+@dashboard.route('/')
+@dashboard.route('/index')
 def index():
     return render_template("index.html",
                            title='Home')
     
-@app.route('/error')
+@dashboard.route('/error')
 def error():
     return render_template("error.html",
                            title='Error')
 
 
-@app.route('/events', methods = ['GET'])
+@dashboard.route('/events/', methods = ['GET'])
+@dashboard.route('/events', methods = ['GET'])
 def eventswrapper():
     return render_template('eventswrapper.html')
 
-@app.route('/events/<sessionid>', methods = ['GET'])
+@dashboard.route('/events/<sessionid>', methods = ['GET'])
 def events(sessionid):
     return render_template('events.html', sessionid = sessionid)
 
 
-@app.route('/get_events/<sessionid>', methods = ['GET'])
+@dashboard.route('/get_events/<sessionid>', methods = ['GET'])
 def get_events(sessionid):
     """The index page makes a request to the gameevents service and
     provides a live feed of the game events for a determined session      
@@ -48,7 +53,7 @@ def get_events(sessionid):
         events_controller = controller.EventsController()
         events_result = events_controller.get_events(sessionid)   
         if events_result:
-            app.logger.debug(events_result)
+            current_app.logger.debug(events_result)
             if "count" in events_result:
                 count = events_result["count"]
             if "results" in events_result:
@@ -57,10 +62,10 @@ def get_events(sessionid):
             for event_xml in events_xml:
                 formatted_event = {}
                 
-                #app.logger.debug(event_xml["gameevent"])
+                LOG.debug(event_xml["gameevent"])
                 myevent = objectify.fromstring(event_xml["gameevent"])
                 
-                app.logger.debug(myevent)
+                current_app.logger.debug(myevent)
                 
                 try:
                     formatted_event["level"] = '%s' % myevent.level
@@ -78,7 +83,7 @@ def get_events(sessionid):
                 except AttributeError:
                     formatted_event["action"] = "==No action=="
                 
-                app.logger.debug(formatted_event)
+                current_app.logger.debug(formatted_event)
                 events.append(formatted_event)
             
             #app.logger.debug(events)

@@ -3,21 +3,15 @@ Controller of the application, which defines the behaviour
 of the application when called by the views.
 '''
 
-import uuid, OpenSSL
-from app import app, db, models
-
-import requests #Make REST calls
+#Make REST calls
+import requests 
 from requests import RequestException
 
-#from app.errors import InvalidGamingSession, TokenExpired
-from flask.ext.api.exceptions import AuthenticationFailed
-from flask import render_template
-
-from sqlalchemy.orm.exc import NoResultFound 
-
-from itsdangerous import BadSignature, SignatureExpired
-
 from config import GAMEEVENTS_SERVICE_ENDPOINT
+
+#Logging
+from logging import getLogger
+LOG = getLogger(__name__)
 
 class EventsController:
     
@@ -29,7 +23,7 @@ class EventsController:
         try:
             token = self.get_token(sessionid)
             if token:
-                app.logger.debug("Sending request for events...")
+                LOG.debug("Sending request for events...")
                 payload = {"token": token}
                 url = GAMEEVENTS_SERVICE_ENDPOINT + '/events'
                 response = requests.post(url, json=payload)
@@ -38,7 +32,7 @@ class EventsController:
             else:
                 return False
         except RequestException as e:
-            app.logger.error(e.args, exc_info=False)
+            LOG.error(e.args, exc_info=False)
             raise e
             #return render_template('error.html', error="Could not process your request, sorry! Reason: %s " % str(e.args))
     
@@ -48,7 +42,7 @@ class EventsController:
         else:
             payload = {"clientid": "dashboard", "apikey": "dashboardapikey", "sessionid": sessionid}
             url = GAMEEVENTS_SERVICE_ENDPOINT + '/token'
-            app.logger.debug("sending request for token...")
+            LOG.debug("sending request for token...")
             
             try:
                 response = requests.post(url, json=payload)
@@ -59,18 +53,18 @@ class EventsController:
                         token = myresponse["token"]
                         return token
                     else:
-                        app.logger.debug("Server response: %s " % myresponse["message"])
+                        LOG.debug("Server response: %s " % myresponse["message"])
                         raise Exception("Unknown error when trying to get token.")
                 else:
                     if "message" in myresponse:
-                        app.logger.debug("Server response: %s " % myresponse["message"])
+                        LOG.debug("Server response: %s " % myresponse["message"])
                         #response.raise_for_status()
             except RequestException as e:
-                app.logger.error("Request exception when trying to get a token. returning false")
-                app.logger.error(e.args, exc_info=False)
+                LOG.error("Request exception when trying to get a token. returning false")
+                LOG.error(e.args, exc_info=False)
                 return False
             except Exception as e:
-                app.logger.error("Unknown exception when trying to get a token")
-                app.logger.error(e.args, exc_info=False)
+                LOG.error("Unknown exception when trying to get a token")
+                LOG.error(e.args, exc_info=False)
                 raise e
     
