@@ -14,7 +14,5 @@ nav = Nav()
 
 nav.register_element('top', Navbar(
          Link('Home', dest='/'),
-         Link('Sessions', dest='/sessions'),
-         Link('Events', dest='/events'),
          )
     )

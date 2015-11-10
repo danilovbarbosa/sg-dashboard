@@ -21,3 +21,6 @@ GAMEEVENTS_SERVICE_ENDPOINT = 'http://127.0.0.1:5000/gameevents/api/v1.0'
 
 # Hard-code disabling CDN support:
 BOOTSTRAP_SERVE_LOCAL = True
+
+CLIENTID = "dashboard"
+APIKEY = "dashboardapikey"

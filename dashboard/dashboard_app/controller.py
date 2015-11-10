@@ -7,7 +7,7 @@ of the application when called by the views.
 import requests 
 from requests import RequestException
 
-from config import GAMEEVENTS_SERVICE_ENDPOINT
+from config import GAMEEVENTS_SERVICE_ENDPOINT, CLIENTID, APIKEY
 
 #Logging
 from logging import getLogger
@@ -40,7 +40,7 @@ class EventsController:
         if self.token:
             return self.token
         else:
-            payload = {"clientid": "dashboard", "apikey": "dashboardapikey", "sessionid": sessionid}
+            payload = {"clientid": CLIENTID, "apikey": APIKEY, "sessionid": sessionid}
             url = GAMEEVENTS_SERVICE_ENDPOINT + '/token'
             LOG.debug("sending request for token...")
             
@@ -68,3 +68,30 @@ class EventsController:
                 LOG.error(e.args, exc_info=False)
                 raise e
     
+    def get_sessions(self):
+        try:
+            payload = {"clientid": CLIENTID, "apikey": APIKEY}
+            url = GAMEEVENTS_SERVICE_ENDPOINT + '/sessions'
+            LOG.debug("requesting existing sessions...")
+            response = requests.post(url, json=payload)
+            myresponse = response.json()
+            #LOG.debug(myresponse)
+            
+            if (response.status_code==200): 
+                #LOG.debug("Response 200.")       
+                if "results" in myresponse:
+                    #sessions_list = myresponse["results"]
+                    #LOG.debug(sessions_list)
+                    return myresponse
+                else:
+                    LOG.debug("Server response: %s " % myresponse["message"])
+                    raise Exception("Unknown error when trying to get sessions.")
+            else:
+                if "message" in myresponse:
+                    LOG.debug("Server response: code %s, message: %s " % (response.status_code, myresponse["message"]))
+                    raise Exception("Unknown error when trying to get sessions.")            
+
+        except RequestException as e:
+            LOG.error(e.args, exc_info=False)
+            raise e
+        

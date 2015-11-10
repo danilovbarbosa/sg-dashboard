@@ -5,43 +5,6 @@
 {% block scripts %}
 {{super()}}
 
-<script type=text/javascript>
-
-$(function() {
-	$( document ).ready(function() {
-		var url = $SCRIPT_ROOT + "/get_events/{{ sessionid }}";
-		
-		$.getJSON( url )
-		  .done(function( json ) {
-		  	build_table(json.data);
-		    //console.log( "JSON Data: " + json.data );
-		  })
-		  .fail(function( jqxhr, textStatus, error ) {
-		    var err = textStatus + ", " + error;
-		    console.log( "Request Failed: " + err );
-		    
-		});
-
-
-    }); 
-}); 
-
-function build_table(fulldata) {
-	//alert(fulldata);
-	$.each(fulldata, function(index, data) {
-		var write;		
-	    write += '<tr><td>' + data.timestamp + '</td>';
-	    write += '<td>' + data.level + '</td>';
-	    write += '<td>' + data.action + '</td></tr>';
-	      //$('#overview').html(write);
-	      //alert(write);
-	    $('#overview > tbody').append(write);
-	}); //end each
-}
-
-		  
-</script> 
-  
 {%- endblock scripts %}
 
 {% block content %}
@@ -55,6 +18,15 @@ function build_table(fulldata) {
 		    </tr>
 		    </thead>
 	    <tbody>
+	    
+	    {% for event in events %}
+		<tr>
+		    <td>{{ event.timestamp }}</td>
+		    <td>{{ event.level }}</td>
+		    <td>{{ event.action }}</td>
+		</tr>
+	  {% endfor %}
+	  
 	    </tbody>
 	
 	    </table>
