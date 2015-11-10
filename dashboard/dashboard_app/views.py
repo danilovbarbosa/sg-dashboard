@@ -33,7 +33,7 @@ def index():
         session_result = events_controller.get_sessions()  
         
         count = 0
-        session_list = []
+        session_list = False
         
         if "count" in session_result:
             count = session_result["count"]

@@ -5,11 +5,19 @@
 
 <p>Click on the session you want to follow.</p>
 
+{% if session_list %}
+
 <ul>
 {% for session in session_list %}
   <li><a href="/events/{{ session.sessionid }}">{{ session.sessionid }}</a></li>
 {% endfor %}
 </ul>
+
+{% else %}
+
+Sorry, no sessions were found.
+
+{% endif %}
 
     
 {% endblock %}
