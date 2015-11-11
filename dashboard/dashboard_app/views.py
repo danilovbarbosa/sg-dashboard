@@ -8,8 +8,6 @@ from flask import current_app, Blueprint, render_template
 from flask import jsonify
 from lxml import objectify
 
-import datetime
-
 from requests import ConnectionError
 
 from dashboard_app import controller
@@ -68,8 +66,8 @@ def events(sessionid):
         events_result = events_controller.get_events(sessionid)   
         if events_result:
             current_app.logger.debug(events_result)
-            if "count" in events_result:
-                count = events_result["count"]
+#             if "count" in events_result:
+#                 count = events_result["count"]
             if "results" in events_result:
                 events_xml = events_result["results"]
             events = []
@@ -137,8 +135,8 @@ def get_events(sessionid):
         events_result = events_controller.get_events(sessionid)   
         if events_result:
             current_app.logger.debug(events_result)
-            if "count" in events_result:
-                count = events_result["count"]
+#             if "count" in events_result:
+#                 count = events_result["count"]
             if "results" in events_result:
                 events_xml = events_result["results"]
             events = []
@@ -185,7 +183,7 @@ def get_events(sessionid):
         #return render_template("error.html",
         #                   title='Error',
         #                   error='Connection error. Is the game events service up?')
-        ajax_response["status"] = "error"
+        ajax_response["status"] = "error: %s" % e.args
 
     return jsonify(ajax_response)    
     

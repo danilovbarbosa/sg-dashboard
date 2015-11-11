@@ -6,6 +6,8 @@ from flask import Flask
 from flask_bootstrap import Bootstrap
 #from flask.ext.sqlalchemy import SQLAlchemy   
 
+bootstrap = Bootstrap()
+
 
 def create_app():
     # We are using the "Application Factory"-pattern here:
@@ -14,7 +16,7 @@ def create_app():
     app = Flask(__name__)
 
     # Install our Bootstrap extension
-    Bootstrap(app)
+    bootstrap.init_app(app)
     
     # Configure app
     app.config.from_object('config')

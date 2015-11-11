@@ -5,14 +5,18 @@ of the application when called by the views.
 
 #Make REST calls
 import requests 
-from requests import RequestException
 
+# Exceptions and errors
+from requests import RequestException
+from json.decoder import JSONDecodeError
+
+# Configuration
 from config import GAMEEVENTS_SERVICE_ENDPOINT, CLIENTID, APIKEY
 
 #Logging
 from logging import getLogger
-from json.decoder import JSONDecodeError
 LOG = getLogger(__name__)
+
 
 class EventsController:
     
