@@ -6,7 +6,7 @@ Created on 15 Oct 2015
 from migrate.versioning import api
 from config import SQLALCHEMY_DATABASE_URI
 from config import SQLALCHEMY_MIGRATE_REPO
-from app import db
+from dashboard_app import db
 import os.path
 db.create_all()
 if not os.path.exists(SQLALCHEMY_MIGRATE_REPO):
