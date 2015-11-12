@@ -85,29 +85,34 @@ class EventsController:
     
     def get_sessions(self):
         try:
-            payload = {"clientid": CLIENTID, "apikey": APIKEY}
-            url = GAMEEVENTS_SERVICE_ENDPOINT + '/sessions'
-            LOG.debug("requesting existing sessions...")
-            response = requests.post(url, json=payload)
-            myresponse = response.json()
-            #LOG.debug(myresponse)
+            token = self.get_token()
+            if not token:
+                raise Exception("Not able to get a valid token.")
+            else:             
             
-            if (response.status_code==200): 
-                #LOG.debug("Response 200.")       
-                if "results" in myresponse:
-                    #sessions_list = myresponse["results"]
-                    #LOG.debug(sessions_list)
-                    return myresponse
+                payload = {"token": token}
+                url = GAMEEVENTS_SERVICE_ENDPOINT + '/sessions'
+                LOG.debug("requesting existing sessions...")
+                response = requests.post(url, json=payload)
+                myresponse = response.json()
+                #LOG.debug(myresponse)
+                
+                if (response.status_code==200): 
+                    #LOG.debug("Response 200.")       
+                    if "results" in myresponse:
+                        #sessions_list = myresponse["results"]
+                        #LOG.debug(sessions_list)
+                        return myresponse
+                    else:
+                        LOG.debug("Server response: %s " % myresponse["message"])
+                        raise Exception("Unknown error when trying to get sessions.")
+                elif (response.status_code==401):
+                        LOG.debug("Server response: %s " % myresponse["message"])
+                        raise RequestException("Not authorized.")
                 else:
-                    LOG.debug("Server response: %s " % myresponse["message"])
-                    raise Exception("Unknown error when trying to get sessions.")
-            elif (response.status_code==401):
-                    LOG.debug("Server response: %s " % myresponse["message"])
-                    raise RequestException("Not authorized.")
-            else:
-                if "message" in myresponse:
-                    LOG.debug("Server response: code %s, message: %s " % (response.status_code, myresponse["message"]))
-                    raise Exception("Unknown error when trying to get sessions.")            
+                    if "message" in myresponse:
+                        LOG.debug("Server response: code %s, message: %s " % (response.status_code, myresponse["message"]))
+                        raise Exception("Unknown error when trying to get sessions.")            
 
         except RequestException as e:
             LOG.error(e.args, exc_info=False)
