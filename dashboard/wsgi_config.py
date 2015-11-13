@@ -1,7 +1,7 @@
 import os
 import sys
 
-path = '/home/carvalhomb/sg-dashboard/dashboard_app '
+path = '/home/carvalhomb/sg-dashboard/dashboard'
 if path not in sys.path:
     sys.path.append(path)
 
