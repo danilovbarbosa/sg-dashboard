@@ -9,7 +9,7 @@
 
 <ul>
 {% for session in session_list %}
-  <li><a href="/events/{{ session.sessionid }}">{{ session.sessionid }}</a></li>
+  <li><a href="/events/{{ session.id }}">Game by USER, started at {{ session.timestamp }}</a></li>
 {% endfor %}
 </ul>
 
