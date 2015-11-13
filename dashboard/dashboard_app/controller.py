@@ -8,7 +8,6 @@ import requests
 
 # Exceptions and errors
 from requests import RequestException
-from json.decoder import JSONDecodeError
 
 # Configuration
 from config import GAMEEVENTS_SERVICE_ENDPOINT, CLIENTID, APIKEY
@@ -40,8 +39,8 @@ class EventsController:
         except RequestException as e:
             LOG.error(e.args, exc_info=True)
             raise e
-        except JSONDecodeError as e:
-            LOG.error("Returned message is not proper JSON.")
+        except ValueError as e:
+            LOG.error(e.args, exc_info=False)
             return False
         except Exception as e:
             LOG.error(e.args, exc_info=True)
