@@ -87,7 +87,8 @@ def events(sessionid):
                 try:
                     #timestamp = datetime.datetime.fromtimestamp(myevent.timestamp)
                     #formatted_event["timestamp"] = '%s' % timestamp.strftime( "%Y-%m-%d %H:%M:%S %Z")
-                    formatted_event["timestamp"] = '%s' % myevent.timestamp
+                    #formatted_event["timestamp"] = '%s' % myevent.timestamp
+                    formatted_event["timestamp"] = myevent.timestamp
                 except AttributeError:
                     formatted_event["timestamp"] = "==No timestamp=="
                     
@@ -100,10 +101,10 @@ def events(sessionid):
                 events.append(formatted_event)
             
             #app.logger.debug(events)
-            #Invert the response
-            events.reverse()
-            #app.logger.debug(events)
-            events_list = events
+            #events.reverse()
+
+            #Sort by timestamp desc
+            events_list = sorted(events, key=lambda d: d['timestamp'], reverse = True)
 
         
         else:
