@@ -10,7 +10,7 @@ import requests
 from requests import RequestException
 
 # Configuration
-from config import GAMEEVENTS_SERVICE_ENDPOINT, CLIENTID, APIKEY
+from config import GAMEEVENTS_SERVICE_ENDPOINT, CLIENTID, APIKEY, USERPROFILE_SERVICE_ENDPOINT
 
 #Logging
 from logging import getLogger
@@ -99,21 +99,40 @@ class EventsController:
                 if (response.status_code==200): 
                     #LOG.debug("Response 200.")       
                     if "results" in myresponse:
-                        #sessions_list = myresponse["results"]
+                        sessions_list = myresponse["results"]
+                        for session in sessions_list:
+                            username = self.get_user_from_sessionid(session["id"])
+                            session["username"] = username
+                            #LOG.debug(session)
+                            #LOG.debug(user)
                         #LOG.debug(sessions_list)
+                        myresponse["results"]=sessions_list
                         return myresponse
                     else:
-                        LOG.debug("Server response: %s " % myresponse["message"])
+                        #LOG.debug("Server response: %s " % myresponse["message"])
                         raise Exception("Unknown error when trying to get sessions.")
                 elif (response.status_code==401):
-                        LOG.debug("Server response: %s " % myresponse["message"])
+                        #LOG.debug("Server response: %s " % myresponse["message"])
                         raise RequestException("Not authorized.")
                 else:
                     if "message" in myresponse:
-                        LOG.debug("Server response: code %s, message: %s " % (response.status_code, myresponse["message"]))
+                        #LOG.debug("Server response: code %s, message: %s " % (response.status_code, myresponse["message"]))
                         raise Exception("Unknown error when trying to get sessions.")            
 
         except RequestException as e:
             LOG.error(e.args, exc_info=False)
             raise e
+        
+    def get_user_from_sessionid(self, sessionid):
+        payload = {"sessionid": sessionid}
+        url = USERPROFILE_SERVICE_ENDPOINT + '/userinfo'
+        response = requests.post(url, json=payload)
+        myresponse = response.json()
+        try:
+            username = myresponse["result"]["username"]
+        except KeyError:
+            username = False
+        
+        LOG.debug(myresponse)
+        return(username)
         
