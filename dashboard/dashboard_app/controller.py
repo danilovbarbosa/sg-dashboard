@@ -8,12 +8,14 @@ import requests
 
 # Exceptions and errors
 from requests import RequestException
+from simplejson.decoder import JSONDecodeError
 
 # Configuration
 from config import GAMEEVENTS_SERVICE_ENDPOINT, CLIENTID, APIKEY, USERPROFILE_SERVICE_ENDPOINT
 
 #Logging
 from logging import getLogger
+
 LOG = getLogger(__name__)
 
 
@@ -28,12 +30,29 @@ class EventsController:
             token = self.get_token()
             if token:
                 LOG.debug("Sending request for events...")
-                payload = {"token": token, "sessionid": sessionid}
-                url = GAMEEVENTS_SERVICE_ENDPOINT + '/events'
-                response = requests.post(url, json=payload)
-                myresponse = response.json()
-                LOG.debug(myresponse)
-                return(myresponse)
+                #payload = {"token": token, "sessionid": sessionid}
+                headers = {}
+                headers["X-AUTH-TOKEN"] = token
+                url = GAMEEVENTS_SERVICE_ENDPOINT + '/sessions/%s/events' % sessionid
+                response = requests.get(url, headers=headers)
+                if (response.status_code==200): 
+                    formatted_response = {}
+                    try:    
+                        count = int(response.headers.get('X-Total-Count', None))                    
+                        json_response = response.json()
+                        formatted_response["items"]=json_response
+                        formatted_response["count"]=count
+                        return formatted_response
+                    except KeyError:
+                        #LOG.debug("Server response: %s " % myresponse["message"])
+                        raise Exception("Unrecognized response from server")
+
+                elif (response.status_code==400):
+                    raise RequestException("Badly formed request.")
+                elif (response.status_code==401):
+                    raise RequestException("Not authorized.")
+                else:
+                    raise Exception("Unknown error when trying to get token.")
             else:
                 return False
         except RequestException as e:
@@ -88,34 +107,32 @@ class EventsController:
             if not token:
                 raise Exception("Not able to get a valid token.")
             else:             
-            
-                payload = {"token": token}
+                headers = {}
+                headers["X-AUTH-TOKEN"] = token
                 url = GAMEEVENTS_SERVICE_ENDPOINT + '/sessions'
                 LOG.debug("requesting existing sessions...")
-                response = requests.post(url, json=payload)
-                myresponse = response.json()
-                LOG.debug(myresponse)
+                response = requests.get(url, headers=headers)
+                json_response = response.json()
+                formatted_response = {}
                 
                 if (response.status_code==200): 
-                    #LOG.debug("Response 200.")       
-                    if "results" in myresponse:
-                        sessions_list = myresponse["results"]
-                        for session in sessions_list:
+                    #LOG.debug("Response 200.") 
+                    count = int(response.headers.get('X-Total-Count', None))
+                    try:
+                        for session in json_response:
                             username = self.get_user_from_sessionid(session["id"])
                             session["username"] = username
-                            #LOG.debug(session)
-                            #LOG.debug(user)
-                        #LOG.debug(sessions_list)
-                        myresponse["results"]=sessions_list
-                        return myresponse
-                    else:
+                        formatted_response["items"]=json_response
+                        formatted_response["count"]=count
+                        return formatted_response
+                    except KeyError:
                         #LOG.debug("Server response: %s " % myresponse["message"])
-                        raise Exception("Unknown error when trying to get sessions.")
+                        raise Exception("Unrecognized response from server")
                 elif (response.status_code==401):
                         #LOG.debug("Server response: %s " % myresponse["message"])
                         raise RequestException("Not authorized.")
                 else:
-                    if "message" in myresponse:
+                    if "errors" in json_response:
                         #LOG.debug("Server response: code %s, message: %s " % (response.status_code, myresponse["message"]))
                         raise Exception("Unknown error when trying to get sessions.")            
 
@@ -127,12 +144,13 @@ class EventsController:
         url = USERPROFILE_SERVICE_ENDPOINT + '/sessions/' + sessionid 
         response = requests.get(url)
         if response.status_code == 200:
-            myresponse = response.json()
-            #LOG.debug(myresponse)
             try:
-                username = myresponse["result"]["user"]["username"]            
-            except KeyError:
-                username = False
+                myresponse = response.json()
+                username = myresponse["user"][0]["username"]    
+            except JSONDecodeError:
+                username="<unknown>"         
+            except (KeyError, TypeError):
+                username = "<unknown>"
         else:
             username = "<unknown>"       
         
