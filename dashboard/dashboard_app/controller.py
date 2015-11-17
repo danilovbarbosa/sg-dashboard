@@ -22,7 +22,7 @@ class EventsController:
     def __init__ (self):
         #start with empty token
         self.token = False
-
+        
     def get_events(self, sessionid):
         try:
             token = self.get_token()
@@ -94,7 +94,7 @@ class EventsController:
                 LOG.debug("requesting existing sessions...")
                 response = requests.post(url, json=payload)
                 myresponse = response.json()
-                #LOG.debug(myresponse)
+                LOG.debug(myresponse)
                 
                 if (response.status_code==200): 
                     #LOG.debug("Response 200.")       
@@ -124,15 +124,17 @@ class EventsController:
             raise e
         
     def get_user_from_sessionid(self, sessionid):
-        payload = {"sessionid": sessionid}
-        url = USERPROFILE_SERVICE_ENDPOINT + '/userinfo'
-        response = requests.post(url, json=payload)
-        myresponse = response.json()
-        try:
-            username = myresponse["result"]["username"]
-        except KeyError:
-            username = False
+        url = USERPROFILE_SERVICE_ENDPOINT + '/sessions/' + sessionid 
+        response = requests.get(url)
+        if response.status_code == 200:
+            myresponse = response.json()
+            #LOG.debug(myresponse)
+            try:
+                username = myresponse["result"]["user"]["username"]            
+            except KeyError:
+                username = False
+        else:
+            username = "<unknown>"       
         
-        LOG.debug(myresponse)
         return(username)
         
