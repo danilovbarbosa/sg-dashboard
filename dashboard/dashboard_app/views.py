@@ -7,6 +7,7 @@ by the :mod:`controller`.
 from flask import current_app, Blueprint, render_template
 from flask import jsonify
 from lxml import objectify
+import dateutil.parser
 
 from requests import ConnectionError
 
@@ -30,13 +31,15 @@ def index():
         
         result = events_controller.get_sessions()  
         
+        sessions_list_sorted = sorted(result["items"], key=lambda d: dateutil.parser.parse(d['timestamp']), reverse = True)
+        
         count = 0
         session_list = []
         
         if "count" in result:
             count = result["count"]
         if "items" in result:
-            session_list = result["items"]
+            session_list = sessions_list_sorted
 
         return render_template("index.html", session_list = session_list, 
                                count = count, title='Dashboard Home')
