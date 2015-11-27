@@ -40,7 +40,7 @@ class EventsController:
                     try:    
                         count = int(response.headers.get('X-Total-Count', None))                    
                         json_response = response.json()
-                        formatted_response["items"]=json_response
+                        formatted_response["events"]=json_response
                         formatted_response["count"]=count
                         return formatted_response
                     except KeyError:

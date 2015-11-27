@@ -8,6 +8,7 @@ from flask import current_app, Blueprint, render_template
 from flask import jsonify
 from lxml import objectify
 import dateutil.parser
+import json
 
 from requests import ConnectionError
 
@@ -64,17 +65,23 @@ def error():
 def events(sessionid):
     #ajax_response = {}
     list_events_as_dict = []
-    list_events_as_xml = []
+    #list_events_as_xml = []
     try:
         events_controller = controller.EventsController()
         result = events_controller.get_events(sessionid)
         #LOG.debug(events_result) 
         if result:
-            if "items" in result:
-                list_events_as_xml = result["items"]
-            for event_as_xml in list_events_as_xml:
+#             if "items" in result:
+#                 list_events_as_xml = result["items"]
+#             for event_as_xml in list_events_as_xml:
+#                 formatted_event = {}
+#                 myevent = objectify.fromstring(event_as_xml["gameevent"])
+            if "events" in result:
+                events = result["events"]
+            
+            for event in events:
                 formatted_event = {}
-                myevent = objectify.fromstring(event_as_xml["gameevent"])
+                myevent = json.loads(event)
                
                 try:
                     formatted_event["level"] = '%s' % myevent.level
