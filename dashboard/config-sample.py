@@ -18,6 +18,7 @@ WTF_CSRF_ENABLED = True
 SECRET_KEY = 'heytheredonottrytomesswithmemister2'
 
 GAMEEVENTS_SERVICE_ENDPOINT = 'http://127.0.0.1:5000/gameevents/api/v1.0'
+USERPROFILE_SERVICE_ENDPOINT = 'http://127.0.0.1:5002/userprofile/api/v1.0'
 
 # Hard-code disabling CDN support:
 BOOTSTRAP_SERVE_LOCAL = True
