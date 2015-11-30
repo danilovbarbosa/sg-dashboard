@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+
+<p> Welcome to the dashboard. Here you can see the live feed of game events coming from the game Lix. </p>
+
+<p>Click on the session you want to follow.</p>
+
+{% if count>0 %}
+
+<ul>
+{% for session in session_list %}
+  <li><a href="/events/{{ session.id }}">Game by username <b>{{session.username}}</b>, 
+  started at <em>{{ session.timestamp }}</em></a></li>
+{% endfor %}
+</ul>
+
+{% else %}
+
+Sorry, no sessions were found.
+
+{% endif %}
+
+    
+{% endblock %}
