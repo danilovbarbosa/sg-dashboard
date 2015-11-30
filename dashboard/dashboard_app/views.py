@@ -16,10 +16,17 @@ from dashboard_app import controller
 
 #Logging
 from logging import getLogger
+from simplejson.scanner import JSONDecodeError
 LOG = getLogger(__name__)
 
 #Blueprint
 dashboard = Blueprint('dashboard', __name__, url_prefix='')
+
+@dashboard.route('/error')
+def error():
+    return render_template("error.html",
+                           title='Error')
+
 
 @dashboard.route('/')
 @dashboard.route('/index')
@@ -50,145 +57,81 @@ def index():
                            title='Error', error=e.args)        
     
     
-@dashboard.route('/error')
-def error():
-    return render_template("error.html",
-                           title='Error')
 
 
-# @dashboard.route('/events/', methods = ['GET'])
-# @dashboard.route('/events', methods = ['GET'])
-# def eventswrapper():
-#     return render_template('eventswrapper.html')
 
 @dashboard.route('/events/<sessionid>', methods = ['GET'])
 def events(sessionid):
-    #ajax_response = {}
-    list_events_as_dict = []
-    #list_events_as_xml = []
+    events_list = []
     try:
         events_controller = controller.EventsController()
         result = events_controller.get_events(sessionid)
-        #LOG.debug(events_result) 
         if result:
-#             if "items" in result:
-#                 list_events_as_xml = result["items"]
-#             for event_as_xml in list_events_as_xml:
-#                 formatted_event = {}
-#                 myevent = objectify.fromstring(event_as_xml["gameevent"])
-            if "events" in result:
-                events = result["events"]
-            
-            for event in events:
-                formatted_event = {}
-                myevent = json.loads(event)
-               
-                try:
-                    formatted_event["level"] = '%s' % myevent.level
-                except AttributeError:
-                    formatted_event["level"] = "==Not in a level=="
-            
-                try:
-                    #timestamp = datetime.datetime.fromtimestamp(myevent.timestamp)
-                    #formatted_event["timestamp"] = '%s' % timestamp.strftime( "%Y-%m-%d %H:%M:%S %Z")
-                    #formatted_event["timestamp"] = '%s' % myevent.timestamp
-                    formatted_event["timestamp"] = myevent.timestamp
-                except AttributeError:
-                    formatted_event["timestamp"] = "==No timestamp=="
-                    
-                try:
-                    formatted_event["action"] = '%s' % myevent.action
-                except AttributeError:
-                    formatted_event["action"] = "==No action=="
-
-                list_events_as_dict.append(formatted_event)
-            
-            #app.logger.debug(events)
-            #events.reverse()
-
-            #Sort by timestamp desc
-            events_list_sorted = sorted(list_events_as_dict, key=lambda d: d['timestamp'], reverse = True)
-
-        
-        else:
-            events_list_sorted = []
+            try:
+                for event in result["events"]:
+                    #LOG.debug(event)
+                    formatted_event = _format_event(event)
+                    LOG.debug(formatted_event)
+                    events_list.append(formatted_event)
+            except (AttributeError,KeyError,JSONDecodeError):
+                return render_template("error.html",
+                       title='Error',
+                       error='Error reading the list of events from service.')
 
     except ConnectionError as e:
         return render_template("error.html",
                            title='Error',
                            error='Connection error. Is the game events service up?')
-        #events_list["status"] = "error"
+
     except Exception as e:
+        LOG.error(e.args, exc_info=True)
         return render_template("error.html",
                            title='Error',
                            error=e.args)
-        #events_list["status"] = "error"
 
-    #return jsonify(ajax_response) 
+    #Sort by timestamp desc
+    events_list_sorted = sorted(events_list, key=lambda d: d['timestamp'], reverse = True)  
+            
     return render_template('events.html', events = events_list_sorted, sessionid=sessionid)
 
 
-# @dashboard.route('/events/<sessionid>', methods = ['GET'])
-# def get_events(sessionid):
-#     """The index page makes a request to the gameevents service and
-#     provides a live feed of the game events for a determined session      
-#     """
-#     events_xml = False
-#     ajax_response = {}
-#     try:
-#         events_controller = controller.EventsController()
-#         events_result = events_controller.get_events(sessionid)   
-#         if events_result:
-#             current_app.logger.debug(events_result)
-# #             if "count" in events_result:
-# #                 count = events_result["count"]
-#             if "results" in events_result:
-#                 events_xml = events_result["results"]
-#             events = []
-#             for event_xml in events_xml:
-#                 formatted_event = {}
-#                 
-#                 #LOG.debug(event_xml["gameevent"])
-#                 myevent = objectify.fromstring(event_xml["gameevent"])
-#                 
-#                 #current_app.logger.debug(myevent)
-#                 
-#                 try:
-#                     formatted_event["level"] = '%s' % myevent.level
-#                 except AttributeError:
-#                     formatted_event["level"] = "==Not in a level=="
-#             
-#                 try:
-#                     #timestamp = datetime.datetime.fromtimestamp(myevent.timestamp)
-#                     #formatted_event["timestamp"] = '%s' % timestamp.strftime( "%Y-%m-%d %H:%M:%S %Z")
-#                     formatted_event["timestamp"] = '%s' % myevent.timestamp
-#                 except AttributeError:
-#                     formatted_event["timestamp"] = "==No timestamp=="
-#                     
-#                 try:
-#                     formatted_event["action"] = '%s' % myevent.action
-#                 except AttributeError:
-#                     formatted_event["action"] = "==No action=="
-#                 
-#                 current_app.logger.debug(formatted_event)
-#                 events.append(formatted_event)
-#             
-#             #app.logger.debug(events)
-#             #Invert the response
-#             events.reverse()
-#             #app.logger.debug(events)
-#             ajax_response["status"] = "success"
-#             ajax_response["data"] = events
-# 
-#         
-#         else:
-#             ajax_response["status"] = "error"
-# 
-#     except ConnectionError as e:
-#         #return render_template("error.html",
-#         #                   title='Error',
-#         #                   error='Connection error. Is the game events service up?')
-#         ajax_response["status"] = "error: %s" % e.args
-# 
-#     return jsonify(ajax_response)    
+
+def _format_event(event):
+    """Internal helper function to clean up fields in the event before sending to template"""
+    
+    if not ("level" in event):
+        event["level"] = "==Not in a level=="
+    else:
+        if (event["level"] == ""):
+            event["level"] = "==Not in a level=="
+    
+    if not ("timestamp" in event):
+        event["timestamp"] = "==No timestamp=="
+    else:
+        if (event["timestamp"] == ""):
+            event["timestamp"] = "==No timestamp=="        
+        
+    if not ("action" in event):
+        event["action"] = "==No action=="
+    else:
+        if event["action"] =="":
+            event["action"] = "==No action=="
+    
+    if not ("update" in event):
+        event["update_string"] = ""
+    else:
+        event["update_string"] = event["update"]
+        event.pop("update", None)
+        
+    if not ("result" in event):
+        event["result"] = {}
+    else:
+        #LOG.debug(event["result"])
+        if len(event["result"])>0:
+            event["result"] = event["result"][0]
+        else:
+            event["result"] = {}
+
+    return(event)
+
     

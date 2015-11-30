@@ -31,15 +31,23 @@
 			        <th>Timestamp</th>
 			        <th>Level</th>
 			        <th>Action</th>
+			        <th>Update</th>
+			        <th>Which lix</th>
+			        <th>Lix saved</th>
+			        <th>Lix required</th>
 			    </tr>
 			    </thead>
 		    <tbody>
 		    
 		    {% for event in events %}
 			<tr>
-			    <td>{{ event.timestamp }}</td>
-			    <td>{{ event.level }}</td>
-			    <td>{{ event.action }}</td>
+			    <td>{{ event["timestamp"] }}</td>
+			    <td>{{ event["level"] }}</td>
+			    <td>{{ event["action"] }}</td>
+			    <td>{{ event["update_string"] }}</td>
+			    <td>{{ event["which_lix"]}}</td>
+			    <td>{{ event["result"]["lix_saved"]}}</td>
+			    <td>{{ event["result"]["lix_required"]}}</td>
 			</tr>
 		  {% endfor %}
 		  

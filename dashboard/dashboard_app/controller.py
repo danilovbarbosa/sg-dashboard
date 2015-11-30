@@ -9,6 +9,7 @@ import requests
 # Exceptions and errors
 from requests import RequestException
 from simplejson.decoder import JSONDecodeError
+import simplejson
 
 # Configuration
 from config import GAMEEVENTS_SERVICE_ENDPOINT, CLIENTID, APIKEY, USERPROFILE_SERVICE_ENDPOINT
@@ -36,13 +37,26 @@ class EventsController:
                 url = GAMEEVENTS_SERVICE_ENDPOINT + '/sessions/%s/events' % sessionid
                 response = requests.get(url, headers=headers)
                 if (response.status_code==200): 
-                    formatted_response = {}
+                    clean_response = {}
                     try:    
                         count = int(response.headers.get('X-Total-Count', None))                    
+                        
+                        #Load the list of responses
                         json_response = response.json()
-                        formatted_response["events"]=json_response
-                        formatted_response["count"]=count
-                        return formatted_response
+                        LOG.debug(json_response)
+                        
+                        #Iterate over the responses and extract the interesting bit (gameevent key)
+                        clean_response = {}
+                        events = []
+                        
+                        for item in json_response:
+                            events.append(item["gameevent"])                        
+                        
+                        clean_response["events"]=events
+                        clean_response["count"]=count
+                        
+                        return clean_response
+                    
                     except KeyError:
                         #LOG.debug("Server response: %s " % myresponse["message"])
                         raise Exception("Unrecognized response from server")
@@ -54,7 +68,7 @@ class EventsController:
                 else:
                     raise Exception("Unknown error when trying to get token.")
             else:
-                return False
+                raise RequestException("Could not get a token.")
         except RequestException as e:
             LOG.error(e.args, exc_info=True)
             raise e
@@ -112,10 +126,9 @@ class EventsController:
                 url = GAMEEVENTS_SERVICE_ENDPOINT + '/sessions'
                 LOG.debug("requesting existing sessions...")
                 response = requests.get(url, headers=headers)
-                json_response = response.json()
-                formatted_response = {}
-                
                 if (response.status_code==200): 
+                    json_response = response.json()
+                    formatted_response = {}
                     #LOG.debug("Response 200.") 
                     count = int(response.headers.get('X-Total-Count', None))
                     try:
@@ -128,6 +141,9 @@ class EventsController:
                     except KeyError:
                         #LOG.debug("Server response: %s " % myresponse["message"])
                         raise Exception("Unrecognized response from server")
+                elif (response.status_code==404):
+                        #LOG.debug("Server response: %s " % myresponse["message"])
+                        raise RequestException("Session does not exist.")
                 elif (response.status_code==401):
                         #LOG.debug("Server response: %s " % myresponse["message"])
                         raise RequestException("Not authorized.")
@@ -141,11 +157,13 @@ class EventsController:
             raise e
         
     def get_user_from_sessionid(self, sessionid):
-        url = USERPROFILE_SERVICE_ENDPOINT + '/sessions/' + sessionid 
+        url = USERPROFILE_SERVICE_ENDPOINT + '/sessions/' + sessionid + '?inactive=true'
         response = requests.get(url)
+        #LOG.debug(response.text)
         if response.status_code == 200:
             try:
                 myresponse = response.json()
+                #LOG.debug(myresponse)
                 username = myresponse["user"][0]["username"]    
             except JSONDecodeError:
                 username="<unknown>"         
