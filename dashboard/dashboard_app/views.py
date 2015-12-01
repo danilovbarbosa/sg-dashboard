@@ -33,6 +33,9 @@ def error():
 @dashboard.route('/events/', methods = ['GET'])
 @dashboard.route('/events', methods = ['GET'])
 def index():
+    '''
+    Lists gaming sessions available to be followed.
+    '''
     session_list = []
     try:
         events_controller = controller.EventsController()
@@ -62,6 +65,10 @@ def index():
 
 @dashboard.route('/events/<sessionid>', methods = ['GET'])
 def events(sessionid):
+    '''
+    Lists game events related to a given *sessionid*.
+    :param sessionid:
+    '''
     events_list = []
     try:
         events_controller = controller.EventsController()
@@ -97,7 +104,11 @@ def events(sessionid):
 
 
 def _format_event(event):
-    """Internal helper function to clean up fields in the event before sending to template"""
+    '''
+    Internal helper function to clean up fields in the event before sending to template.
+    :param event:
+    '''
+    
     
     if not ("level" in event):
         event["level"] = "==Not in a level=="
