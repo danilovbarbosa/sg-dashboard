@@ -35,6 +35,8 @@
 			        <th>Which lix</th>
 			        <th>Lix saved</th>
 			        <th>Lix required</th>
+			        <th>Seconds used</th>
+			        <th>Seconds required</th>
 			    </tr>
 			    </thead>
 		    <tbody>
@@ -48,6 +50,8 @@
 			    <td>{{ event["which_lix"]}}</td>
 			    <td>{{ event["result"]["lix_saved"]}}</td>
 			    <td>{{ event["result"]["lix_required"]}}</td>
+			    <td>{{ event["result"]["seconds_used"]}}</td>
+			    <td>{{ event["result"]["seconds_required"]}}</td>
 			</tr>
 		  {% endfor %}
 		  

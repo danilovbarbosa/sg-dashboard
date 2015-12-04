@@ -21,12 +21,18 @@ LOG = getLogger(__name__)
 
 
 class EventsController:
+    '''Class that manages the display of events in the dashboard.'''
     
     def __init__ (self):
         #start with empty token
         self.token = False
         
     def get_events(self, sessionid):
+        '''
+        Fetches the events from the gameevents service for a given sessionid.
+        :param sessionid:
+        '''
+        
         try:
             token = self.get_token()
             if token:
@@ -81,6 +87,9 @@ class EventsController:
             #return render_template('error.html', error="Could not process your request, sorry! Reason: %s " % str(e.args))
     
     def get_token(self):
+        '''
+        Makes the request to gameevents service for an authentication token.
+        '''
         if self.token:
             return self.token
         else:
@@ -116,6 +125,9 @@ class EventsController:
                 raise e
     
     def get_sessions(self):
+        '''
+        Makes a request to gameevents service to fetch available game sessions.
+        '''
         try:
             token = self.get_token()
             if not token:
@@ -157,6 +169,11 @@ class EventsController:
             raise e
         
     def get_user_from_sessionid(self, sessionid):
+        '''
+        Fetches from the user profile service the username associated to a given sessionid. It also 
+        searches in inactive game sessions.
+        :param sessionid:
+        '''
         url = USERPROFILE_SERVICE_ENDPOINT + '/sessions/' + sessionid + '?inactive=true'
         response = requests.get(url)
         #LOG.debug(response.text)
