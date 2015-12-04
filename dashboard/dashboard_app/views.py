@@ -10,7 +10,7 @@ from flask import jsonify
 import dateutil.parser
 import json
 
-from requests import ConnectionError
+from requests import RequestException, ConnectionError
 
 from dashboard_app import controller
 
@@ -40,24 +40,25 @@ def index():
     try:
         events_controller = controller.EventsController()
         
-        result = events_controller.get_sessions()  
+        result = events_controller.get_sessions()
         
-        sessions_list_sorted = sorted(result["items"], key=lambda d: dateutil.parser.parse(d['timestamp']), reverse = True)
+        items = result['items']
+        count = result['count']
         
-        count = 0
-        session_list = []
+        LOG.debug(items)
         
-        if "count" in result:
-            count = result["count"]
-        if "items" in result:
-            session_list = sessions_list_sorted
-
-        return render_template("index.html", session_list = session_list, 
+        items_sorted = sorted(items, key=lambda d: dateutil.parser.parse(d['created']), reverse = True)
+        
+        return render_template("index.html", session_list = items_sorted, 
                                count = count, title='Dashboard Home')
+    except RequestException as e:
+        LOG.error(e.args, exc_info=True)
+        return render_template("error.html",
+                           title='Error', error=str(e))    
     except Exception as e:
         LOG.error(e.args, exc_info=True)
         return render_template("error.html",
-                           title='Error', error=e.args)        
+                           title='Error', error='Unknown error. The developer has been notified.')        
     
     
 

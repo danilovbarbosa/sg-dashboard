@@ -36,7 +36,7 @@ class EventsController:
         try:
             token = self.get_token()
             if token:
-                LOG.debug("Sending request for events...")
+                #LOG.debug("Sending request for events...")
                 #payload = {"token": token, "sessionid": sessionid}
                 headers = {}
                 headers["X-AUTH-TOKEN"] = token
@@ -65,14 +65,14 @@ class EventsController:
                     
                     except KeyError:
                         #LOG.debug("Server response: %s " % myresponse["message"])
-                        raise Exception("Unrecognized response from server")
+                        raise RequestException("Unrecognized response from server")
 
                 elif (response.status_code==400):
                     raise RequestException("Badly formed request.")
                 elif (response.status_code==401):
                     raise RequestException("Not authorized.")
                 else:
-                    raise Exception("Unknown error when trying to get token.")
+                    raise RequestException("Unknown error when trying to get token.")
             else:
                 raise RequestException("Could not get a token.")
         except RequestException as e:
@@ -95,7 +95,7 @@ class EventsController:
         else:
             payload = {"clientid": CLIENTID, "apikey": APIKEY}
             url = GAMEEVENTS_SERVICE_ENDPOINT + '/token'
-            LOG.debug("sending request for token...")
+            #LOG.debug("sending request for token...")
             
             try:
                 response = requests.post(url, json=payload)
@@ -106,23 +106,25 @@ class EventsController:
                         token = myresponse["token"]
                         return token
                     else:
-                        LOG.debug("Server response: %s " % myresponse["message"])
-                        raise Exception("Unknown error when trying to get token.")
+                        #LOG.debug("Server response: %s " % myresponse["message"])
+                        raise RequestException("Unknown error when trying to get token.")
                 elif (response.status_code==401):
-                    LOG.debug("Server response: %s " % myresponse["message"])
+                    #LOG.debug("Server response: %s " % myresponse["message"])
                     raise RequestException("Not authorized.")
+                elif (response.status_code==400):
+                    #LOG.debug("Server response: %s " % myresponse["message"])
+                    raise RequestException("Badly formed request. Change in the API?")
                 else:
-                    if "message" in myresponse:
-                        LOG.debug("Server response: %s " % myresponse["message"])
-                        #response.raise_for_status()
+                    #LOG.debug("Server response: %s " % myresponse["message"])
+                    response.raise_for_status()
             except RequestException as e:
-                LOG.error("Request exception when trying to get a token. returning false")
-                LOG.error(e.args, exc_info=False)
+                #LOG.error("Request exception when trying to get a token. returning false")
+                #LOG.error(e.args, exc_info=False)
                 return False
             except Exception as e:
-                LOG.error("Unknown exception when trying to get a token")
-                LOG.error(e.args, exc_info=False)
-                raise e
+                #LOG.error("Unknown exception when trying to get a token")
+                LOG.error(e.args, exc_info=True)
+                raise RequestException('Unknown error when trying to get a token.')
     
     def get_sessions(self):
         '''
@@ -131,12 +133,12 @@ class EventsController:
         try:
             token = self.get_token()
             if not token:
-                raise Exception("Not able to get a valid token.")
+                raise RequestException("Not able to get a valid token.")
             else:             
                 headers = {}
                 headers["X-AUTH-TOKEN"] = token
                 url = GAMEEVENTS_SERVICE_ENDPOINT + '/sessions'
-                LOG.debug("requesting existing sessions...")
+                #LOG.debug("requesting existing sessions...")
                 response = requests.get(url, headers=headers)
                 if (response.status_code==200): 
                     json_response = response.json()
@@ -160,9 +162,8 @@ class EventsController:
                         #LOG.debug("Server response: %s " % myresponse["message"])
                         raise RequestException("Not authorized.")
                 else:
-                    if "errors" in json_response:
-                        #LOG.debug("Server response: code %s, message: %s " % (response.status_code, myresponse["message"]))
-                        raise Exception("Unknown error when trying to get sessions.")            
+                    LOG.debug("Server response: %s" % response.get_text() )
+                    response.raise_for_status()            
 
         except RequestException as e:
             LOG.error(e.args, exc_info=False)
