@@ -6,7 +6,7 @@ by the :mod:`controller`.
 
 from flask import current_app, Blueprint, render_template
 from flask import jsonify
-from lxml import objectify
+#from lxml import objectify
 import dateutil.parser
 import json
 
@@ -78,7 +78,7 @@ def events(sessionid):
                 for event in result["events"]:
                     #LOG.debug(event)
                     formatted_event = _format_event(event)
-                    LOG.debug(formatted_event)
+                    #LOG.debug(formatted_event)
                     events_list.append(formatted_event)
             except (AttributeError,KeyError,JSONDecodeError):
                 return render_template("error.html",
