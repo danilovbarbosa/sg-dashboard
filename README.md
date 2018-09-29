@@ -10,7 +10,9 @@ sudo apt-get install git python-pip make build-essential libssl-dev zlib1g-dev l
 ## Create an environment (Linux)
 
 mkdir myproject
+
 cd myproject
+
 python3 -m venv venv
 
 ## Activate the environment
