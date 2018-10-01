@@ -21,7 +21,7 @@ python3 -m venv venv
 
 ## Requires for project sg-dashboard
 
-pip install flask==0.10.1 flask-sqlalchemy==2.0 flask-auth==0.85 flask-api==0.6.2 pyOpenSSL==0.15.1 cryptography==0.8.2 passlib==1.6.4 sqlalchemy-migrate==0.9.6
+pip install flask==0.10.1 flask-sqlalchemy==2.0 flask-auth==0.85 flask-api==0.6.2 flask_bootstrap ApyOpenSSL==0.15.1 cryptography==0.8.2 passlib==1.6.4 sqlalchemy-migrate==0.9.6
 
 ## Try it out
  
