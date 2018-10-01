@@ -12,7 +12,7 @@ from simplejson.decoder import JSONDecodeError
 import simplejson
 
 # Configuration
-from config import GAMEEVENTS_SERVICE_ENDPOINT, CLIENTID, APIKEY, USERPROFILE_SERVICE_ENDPOINT
+from config_sample import GAMEEVENTS_SERVICE_ENDPOINT, CLIENTID, APIKEY, USERPROFILE_SERVICE_ENDPOINT
 
 #Logging
 from logging import getLogger

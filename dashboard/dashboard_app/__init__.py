@@ -4,7 +4,12 @@ Application factory.
 
 from flask import Flask
 from flask_bootstrap import Bootstrap
-#from flask.ext.sqlalchemy import SQLAlchemy   
+#from flask.ext.sqlalchemy import SQLAlchemy 
+
+import os
+import sys  
+sys.path.append(os.path.dirname(__name__))
+import config_sample
 
 bootstrap = Bootstrap()
 
@@ -19,7 +24,7 @@ def create_app():
     bootstrap.init_app(app)
     
     # Configure app
-    app.config.from_object('config')
+    app.config.from_object('config_sample')
     
     # Database?
     #db = SQLAlchemy(app)
@@ -39,7 +44,7 @@ def create_app():
         #Import necessary modules
         import os
         import sys
-        from config import TMPDIR
+        from config_sample import TMPDIR
         import logging
         from logging.handlers import RotatingFileHandler
         #from logging import StreamHandler
@@ -55,5 +60,4 @@ def create_app():
 
 
     return app
-
 

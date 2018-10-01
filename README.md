@@ -24,6 +24,10 @@ python3 -m venv venv
 pip install flask==0.10.1 flask-sqlalchemy==2.0 flask-auth==0.85 flask-api==0.6.2 flask_bootstrap ApyOpenSSL==0.15.1 cryptography==0.8.2 passlib==1.6.4 sqlalchemy-migrate==0.9.6 python-dateutil requests flask_nav
 
 ## Try it out
+
+Clone project (branch sg-l2ForDeaf):
+
+git clone -b sg-l2ForDeaf https://github.com/danilovbarbosa/sg-dashboard.git
  
 Run the server:
 
