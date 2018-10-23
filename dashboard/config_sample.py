@@ -16,3 +16,6 @@ BOOTSTRAP_SERVE_LOCAL = True
 
 CLIENTID = "dashboard"
 APIKEY = "dashboardapikey"
+
+
+DEBUB = True
