@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block html_attribs %}lang="pt-br"{% endblock html_attribs %}
+
+{% block content %}
+
+<p> Bem vindo ao Dashboard. Aqui você poderá ver the o feed ao vivo de eventos de jogo. </p>
+
+<p>Clique no aluno que você quer seguir.</p>
+
+{% if count>0 %}
+
+<ul>
+{% for session in session_list %}
+  <li><a href="/events/{{ session.id }}">Gameplay de <b>{{session.username}}</b>, 
+  começou às <em>{{ session.created }}</em></a></li>
+{% endfor %}
+</ul>
+
+{% else %}
+
+Desculpe, nenhuma sessão foi encontrada.
+
+{% endif %}
+
+    
+{% endblock %}

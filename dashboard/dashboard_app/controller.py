@@ -12,7 +12,7 @@ from simplejson.decoder import JSONDecodeError
 import simplejson
 
 # Configuration
-from config_sample import GAMEEVENTS_SERVICE_ENDPOINT, CLIENTID, APIKEY, USERPROFILE_SERVICE_ENDPOINT
+from config_sample import GAMEEVENTS_SERVICE_ENDPOINT, USERPROFILE_SERVICE_ENDPOINT
 
 #Logging
 from logging import getLogger
@@ -23,9 +23,11 @@ LOG = getLogger(__name__)
 class EventsController:
     '''Class that manages the display of events in the dashboard.'''
     
-    def __init__ (self):
+    def __init__ (self, clientid, apikey):
         #start with empty token
         self.token = False
+        self.clientid = clientid
+        self.apikey = apikey
         
     def get_events(self, sessionid):
         '''
@@ -93,14 +95,18 @@ class EventsController:
         if self.token:
             return self.token
         else:
-            payload = {"clientid": CLIENTID, "apikey": APIKEY}
+            payload = {"clientid": self.clientid, "apikey": self.apikey}
             url = GAMEEVENTS_SERVICE_ENDPOINT + '/token'
-            #LOG.debug("sending request for token...")
-            
+            # LOG.debug("sending request for token..." + GAMEEVENTS_SERVICE_ENDPOINT)
+
             try:
                 response = requests.post(url, json=payload)
                 myresponse = response.json()
                 
+                # print(response.status_code)
+                # print(myresponse)
+
+
                 if (response.status_code==200):        
                     if "token" in myresponse:
                         token = myresponse["token"]
@@ -109,7 +115,7 @@ class EventsController:
                         #LOG.debug("Server response: %s " % myresponse["message"])
                         raise RequestException("Unknown error when trying to get token.")
                 elif (response.status_code==401):
-                    #LOG.debug("Server response: %s " % myresponse["message"])
+                    LOG.debug("Server response: %s " % myresponse["message"])
                     raise RequestException("Not authorized.")
                 elif (response.status_code==400):
                     #LOG.debug("Server response: %s " % myresponse["message"])
@@ -118,7 +124,7 @@ class EventsController:
                     #LOG.debug("Server response: %s " % myresponse["message"])
                     response.raise_for_status()
             except RequestException as e:
-                #LOG.error("Request exception when trying to get a token. returning false")
+                LOG.error("Request exception when trying to get a token. returning false")
                 #LOG.error(e.args, exc_info=False)
                 return False
             except Exception as e:

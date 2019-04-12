@@ -4,7 +4,7 @@ This defines the interaction points, but the actual logic is treated
 by the :mod:`controller`.
 '''
 
-from flask import current_app, Blueprint, render_template
+from flask import current_app, Blueprint, render_template, request
 from flask import jsonify
 #from lxml import objectify
 import dateutil.parser
@@ -36,9 +36,54 @@ def index():
     '''
     Lists gaming sessions available to be followed.
     '''
+    return render_template("index.html", title='Dashboard')
+
+    # session_list = []
+    # try:
+    #     events_controller = controller.EventsController()
+        
+    #     result = events_controller.get_sessions()
+        
+    #     items = result['items']
+    #     count = result['count']
+        
+    #     LOG.debug(items)
+        
+    #     items_sorted = sorted(items, key=lambda d: dateutil.parser.parse(d['created']), reverse = True)
+        
+    #     return render_template("index.html", session_list = items_sorted, 
+    #                            count = count, title='Dashboard Home')
+    # except RequestException as e:
+    #     LOG.error(e.args, exc_info=True)
+    #     return render_template("error.html",
+    #                        title='Error', error=str(e))    
+    # except Exception as e:
+    #     LOG.error(e.args, exc_info=True)
+    #     return render_template("error.html",
+    #                        title='Error', error='Unknown error. The developer has been notified.')     
+
+
+@dashboard.route('/dashboard/', methods = ['POST'])
+def menu():
+    '''
+    Lists gaming sessions available to be followed.
+    '''
+    username_clientid = ""
+    password_apikey = ""
+
+    try:
+        username_clientid = request.form.get('username')
+        password_apikey = request.form.get('password')
+
+    except RequestException as e:
+        LOG.error(e.args, exc_info=True)
+        return render_template("error.html",
+                           title='Error', error=str(e))    
+
+
     session_list = []
     try:
-        events_controller = controller.EventsController()
+        events_controller = controller.EventsController(username_clientid, password_apikey)
         
         result = events_controller.get_sessions()
         
@@ -49,7 +94,7 @@ def index():
         
         items_sorted = sorted(items, key=lambda d: dateutil.parser.parse(d['created']), reverse = True)
         
-        return render_template("index.html", session_list = items_sorted, 
+        return render_template("menu.html", session_list = items_sorted, 
                                count = count, title='Dashboard Home')
     except RequestException as e:
         LOG.error(e.args, exc_info=True)
@@ -60,9 +105,6 @@ def index():
         return render_template("error.html",
                            title='Error', error='Unknown error. The developer has been notified.')        
     
-    
-
-
 
 @dashboard.route('/events/<sessionid>', methods = ['GET'])
 def events(sessionid):
