@@ -18,8 +18,4 @@ USERPROFILE_SERVICE_ENDPOINT = 'http://localhost:5002/v1'
 # Hard-code disabling CDN support:
 BOOTSTRAP_SERVE_LOCAL = True
 
-CLIENTID = "administrator"
-APIKEY = "eyHxTJcuRf43n5ox"
-
-
 DEBUB = True
