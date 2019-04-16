@@ -28,30 +28,30 @@
 	<table id="overview" class="table">
 			  <thead>
 			    <tr>
-			        <th>Timestamp</th>
-			        <th>Level</th>
-			        <th>Action</th>
-			        <th>Update</th>
+							<th>Id da questão</th>
+			        <th>Tempo</th>
+			        <th>Nota</th>
+			        <!-- <th>Update</th>
 			        <th>Which lix</th>
 			        <th>Lix saved</th>
 			        <th>Lix required</th>
 			        <th>Seconds used</th>
-			        <th>Seconds required</th>
+			        <th>Seconds required</th> -->
 			    </tr>
 			    </thead>
 		    <tbody>
 		    
 		    {% for event in events %}
 			<tr>
-			    <td>{{ event["timestamp"] }}</td>
-			    <td>{{ event["level"] }}</td>
-			    <td>{{ event["action"] }}</td>
-			    <td>{{ event["update_string"] }}</td>
+					<td>{{ event["id_questao"] }}</td>
+					<td>{{ event["timestamp"] }}</td>
+			    <td>{{ event["nota"] }}</td>
+			    <!-- <td>{{ event["update_string"] }}</td>
 			    <td>{{ event["which_lix"]}}</td>
 			    <td>{{ event["result"]["lix_saved"]}}</td>
 			    <td>{{ event["result"]["lix_required"]}}</td>
 			    <td>{{ event["result"]["seconds_used"]}}</td>
-			    <td>{{ event["result"]["seconds_required"]}}</td>
+			    <td>{{ event["result"]["seconds_required"]}}</td> -->
 			</tr>
 		  {% endfor %}
 		  

@@ -22,6 +22,9 @@ LOG = getLogger(__name__)
 #Blueprint
 dashboard = Blueprint('dashboard', __name__, url_prefix='')
 
+#Declaration of object responsible for controller of events
+events_controller = False
+
 @dashboard.route('/error')
 def error():
     return render_template("error.html",
@@ -38,30 +41,6 @@ def index():
     '''
     return render_template("index.html", title='Dashboard')
 
-    # session_list = []
-    # try:
-    #     events_controller = controller.EventsController()
-        
-    #     result = events_controller.get_sessions()
-        
-    #     items = result['items']
-    #     count = result['count']
-        
-    #     LOG.debug(items)
-        
-    #     items_sorted = sorted(items, key=lambda d: dateutil.parser.parse(d['created']), reverse = True)
-        
-    #     return render_template("index.html", session_list = items_sorted, 
-    #                            count = count, title='Dashboard Home')
-    # except RequestException as e:
-    #     LOG.error(e.args, exc_info=True)
-    #     return render_template("error.html",
-    #                        title='Error', error=str(e))    
-    # except Exception as e:
-    #     LOG.error(e.args, exc_info=True)
-    #     return render_template("error.html",
-    #                        title='Error', error='Unknown error. The developer has been notified.')     
-
 
 @dashboard.route('/dashboard/', methods = ['POST'])
 def menu():
@@ -75,11 +54,15 @@ def menu():
         username_clientid = request.form.get('username')
         password_apikey = request.form.get('password')
 
+        #This is a ajust for save information username_clientid and password_apikey, because the implementation about session for avoid input again this information yet no finish.
+        data = {"username_clientid": username_clientid, "password_apikey": password_apikey}
+        with open('tmp/data.json', 'w') as outfile:
+            json.dump(data, outfile)
+
     except RequestException as e:
         LOG.error(e.args, exc_info=True)
         return render_template("error.html",
                            title='Error', error=str(e))    
-
 
     session_list = []
     try:
@@ -94,6 +77,7 @@ def menu():
         
         items_sorted = sorted(items, key=lambda d: dateutil.parser.parse(d['created']), reverse = True)
         
+
         return render_template("menu.html", session_list = items_sorted, 
                                count = count, title='Dashboard Home')
     except RequestException as e:
@@ -113,8 +97,13 @@ def events(sessionid):
     :param sessionid:
     '''
     events_list = []
+
     try:
-        events_controller = controller.EventsController()
+        #Read username_clientid and password_apikey
+        with open('tmp/data.json') as json_file:
+            data = json.load(json_file)
+
+        events_controller = controller.EventsController(data["username_clientid"], data["password_apikey"])
         result = events_controller.get_events(sessionid)
         if result:
             try:

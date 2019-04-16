@@ -71,3 +71,6 @@ db_repository/
 
 #Eclipse Pydev project
 .pydevproject
+
+#Json
+*.json
