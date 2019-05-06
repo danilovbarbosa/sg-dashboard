@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 '''
 Defines the views of the dashboard.
 This defines the interaction points, but the actual logic is treated
@@ -13,6 +15,9 @@ import json
 from requests import RequestException, ConnectionError
 
 from dashboard_app import controller
+from dashboard_app import util
+
+
 
 #Logging
 from logging import getLogger
@@ -76,7 +81,7 @@ def menu():
         LOG.debug(items)
         
         items_sorted = sorted(items, key=lambda d: dateutil.parser.parse(d['created']), reverse = True)
-        
+        print(items_sorted)
 
         return render_template("menu.html", session_list = items_sorted, 
                                count = count, title='Dashboard Home')
@@ -99,6 +104,7 @@ def events(sessionid):
     events_list = []
 
     try:
+
         #Read username_clientid and password_apikey
         with open('tmp/data.json') as json_file:
             data = json.load(json_file)
@@ -132,6 +138,26 @@ def events(sessionid):
     events_list_sorted = sorted(events_list, key=lambda d: d['timestamp'], reverse = True)  
             
     return render_template('events.html', events = events_list_sorted, sessionid=sessionid)
+
+
+@dashboard.route('/metrica-acc/<sessionid>')
+def metrica_acc(sessionid):
+    '''
+    Calcula a metrica ACC.
+    '''
+    username = util.get_user_and_password()["username"]
+
+    return render_template("metrica-acc.html", aluno=username ,title='Métrica de Aquisição de Conceitos-Chaves (ACC)')
+
+
+@dashboard.route('/vsr/<sessionid>')
+def vsr(sessionid):
+    '''
+    Escala de Verificação de Similaridade de Respostas (VSR).
+    '''
+    username = util.get_user_and_password()["username"]
+
+    return render_template("vsr.html", aluno=username ,title='Escala de Verificação de Similaridade de Respostas (VSR)')
 
 
 

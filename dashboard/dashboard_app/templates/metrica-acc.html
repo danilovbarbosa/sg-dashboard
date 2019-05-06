@@ -1,0 +1,122 @@
+<!-- extend base layout -->
+{% extends "base.html" %}
+
+
+{% block scripts %}
+{{super()}}
+
+{%- endblock scripts %}
+
+{% block content %}
+
+<div class="container">
+
+<div class="row">
+
+	<div class="col-md-12 col-sm-12">
+
+	<h1>Métrica de Aquisição de Conceitos-Chaves (ACC)</h1>
+
+	<h3>Aluno: {{aluno}}</h3>
+
+	<br />
+
+	<!--<button class="btn btn-primary" onClick="location.reload()" type="button">Refresh</button>-->
+	<!-- Trigger/Open The Modal -->
+	<button id="btnConfigCalcularACC" class="btn btn-primary" onClick="" type="button">Configuar Métrica ACC</button>
+
+	<!-- The Modal -->
+	<div id="modalCalcularACC" class="modal">
+
+	  <!-- Modal content -->
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <span class="close">&times;</span>
+		  <h2>Calcular Métrica de Aquisição de Conceitos-Chaves (ACC)</h2>
+		</div>
+		<div class="modal-body">
+		  <p>Some text in the Modal Body</p>
+		  <p>Some other text...</p>
+		</div>
+		<div class="modal-footer">
+			<button id="btnCalcularACC" class="btn btn-primary" onClick="" type="button">Calcular ACC</button>
+		</div>
+	  </div>
+
+	</div>
+
+	<br /> <br />
+
+	<table id="overview" class="table">
+			  <thead>
+			    <tr>
+							<th>Id da questão</th>
+			        <th>Tempo</th>
+			        <th>Nota</th>
+			        <!-- <th>Update</th>
+			        <th>Which lix</th>
+			        <th>Lix saved</th>
+			        <th>Lix required</th>
+			        <th>Seconds used</th>
+			        <th>Seconds required</th> -->
+			    </tr>
+			    </thead>
+		    <tbody>
+
+		    {% for event in events %}
+			<tr>
+					<td>{{ event["id_questao"] }}</td>
+					<td>{{ event["timestamp"] }}</td>
+			    <td>{{ event["nota"] }}</td>
+			    <!-- <td>{{ event["update_string"] }}</td>
+			    <td>{{ event["which_lix"]}}</td>
+			    <td>{{ event["result"]["lix_saved"]}}</td>
+			    <td>{{ event["result"]["lix_required"]}}</td>
+			    <td>{{ event["result"]["seconds_used"]}}</td>
+			    <td>{{ event["result"]["seconds_required"]}}</td> -->
+			</tr>
+		  {% endfor %}
+
+		    </tbody>
+
+		 </table>
+
+	</div><!--/col-md-12-->
+
+</div><!--/row-->
+
+</div><!--/container-->
+
+
+<script>
+// Get the modal
+var modal = document.getElementById('modalCalcularACC');
+
+// Get the button that opens the modal
+var btn = document.getElementById("btnConfigCalcularACC");
+
+// Get the <span> element that closes the modal
+var span = document.getElementsByClassName("close")[0];
+
+// When the user clicks the button, open the modal
+btn.onclick = function() {
+  modal.style.display = "block";
+}
+
+// When the user clicks on <span> (x), close the modal
+span.onclick = function() {
+  modal.style.display = "none";
+}
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+  if (event.target == modal) {
+    modal.style.display = "none";
+  }
+}
+</script>
+
+
+
+{% endblock %}
+

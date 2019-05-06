@@ -15,13 +15,38 @@
 
 	<div class="col-md-12 col-sm-12">
 	
-	<h1>Game Events</h1>
+	<h1>Eventos do Game </h1>
 	
-	<h3>Showing events for session: {{sessionid}}</h3>
+	<h3>Mostrando eventos para a sessão: {{sessionid}}</h3>
 	
 	<br />
 	
-	<button class="btn btn-primary" onClick="location.reload()" type="button">Refresh page</button>
+	<button class="btn btn-primary" onClick="location.reload()" type="button">Refresh</button>
+	<!-- Trigger/Open The Modal -->
+
+	<a href="/metrica-acc/{{sessionid}}"><button class="btn btn-primary" type="button">Configuar Métrica ACC</button></a>
+
+	<a href="/vsr/{{sessionid}}"><button class="btn btn-primary" type="button">Configuar VSR</button></a>
+
+	<!--&lt;!&ndash; The Modal &ndash;&gt;-->
+	<!--<div id="modalCalcularACC" class="modal">-->
+
+	  <!--&lt;!&ndash; Modal content &ndash;&gt;-->
+	  <!--<div class="modal-content">-->
+		<!--<div class="modal-header">-->
+		  <!--<span class="close">&times;</span>-->
+		  <!--<h2>Calcular Métrica de Aquisição de Conceitos-Chaves (ACC)</h2>-->
+		<!--</div>-->
+		<!--<div class="modal-body">-->
+		  <!--<p>Some text in the Modal Body</p>-->
+		  <!--<p>Some other text...</p>-->
+		<!--</div>-->
+		<!--<div class="modal-footer">-->
+			<!--<button id="btnCalcularACC" class="btn btn-primary" onClick="" type="button">Calcular ACC</button>-->
+		<!--</div>-->
+	  <!--</div>-->
+
+	<!--</div>-->
 
 	<br /> <br />
 	
@@ -65,5 +90,36 @@
 
 </div><!--/container-->
 
+<!--<script>-->
+<!--// Get the modal-->
+<!--var modal = document.getElementById('modalCalcularACC');-->
+
+<!--// Get the button that opens the modal-->
+<!--var btn = document.getElementById("btnConfigCalcularACC");-->
+
+<!--// Get the <span> element that closes the modal-->
+<!--var span = document.getElementsByClassName("close")[0];-->
+
+<!--// When the user clicks the button, open the modal-->
+<!--btn.onclick = function() {-->
+  <!--modal.style.display = "block";-->
+<!--}-->
+
+<!--// When the user clicks on <span> (x), close the modal-->
+<!--span.onclick = function() {-->
+  <!--modal.style.display = "none";-->
+<!--}-->
+
+<!--// When the user clicks anywhere outside of the modal, close it-->
+<!--window.onclick = function(event) {-->
+  <!--if (event.target == modal) {-->
+    <!--modal.style.display = "none";-->
+  <!--}-->
+<!--}-->
+<!--</script>-->
+
+
+
+
 {% endblock %}
-	    
+

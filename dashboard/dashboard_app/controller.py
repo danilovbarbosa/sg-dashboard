@@ -154,6 +154,7 @@ class EventsController:
                     try:
                         for session in json_response:
                             username = self.get_user_from_sessionid(session["id"])
+                            # print("oioioioio:::" + str(username))
                             session["username"] = username
                         formatted_response["items"]=json_response
                         formatted_response["count"]=count
@@ -183,12 +184,22 @@ class EventsController:
         '''
         url = USERPROFILE_SERVICE_ENDPOINT + '/sessions/' + sessionid + '?inactive=true'
         response = requests.get(url)
-        #LOG.debug(response.text)
+
+        # LOG.debug(response.text)
         if response.status_code == 200:
             try:
                 myresponse = response.json()
-                #LOG.debug(myresponse)
-                username = myresponse["user"][0]["username"]    
+                # LOG.debug(myresponse)
+                id_user = myresponse['_links'][1]['href'].split('/', 3)[-1]
+
+                url_user = USERPROFILE_SERVICE_ENDPOINT + '/users/' + id_user
+                response_user = requests.get(url_user)
+
+                # LOG.debug(response_user.json()["message"]["username"])
+
+                username = response_user.json()["message"]["username"]
+                # LOG.debug(username)
+
             except JSONDecodeError:
                 username="<unknown>"         
             except (KeyError, TypeError):
@@ -197,4 +208,3 @@ class EventsController:
             username = "<unknown>"       
         
         return(username)
-        
