@@ -13,6 +13,6 @@ from flask_nav.elements import *
 nav = Nav()
 
 nav.register_element('top', Navbar(
-         Link('Home', dest='/'),
+            Link('Sair', dest='/'),
          )
     )

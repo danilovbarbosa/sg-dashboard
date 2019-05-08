@@ -11,6 +11,7 @@ from flask import jsonify
 #from lxml import objectify
 import dateutil.parser
 import json
+from flask_api import status
 
 from requests import RequestException, ConnectionError
 
@@ -56,6 +57,7 @@ def menu():
     password_apikey = ""
 
     try:
+
         username_clientid = request.form.get('username')
         password_apikey = request.form.get('password')
 
@@ -134,10 +136,14 @@ def events(sessionid):
                            title='Error',
                            error=e.args)
 
+    #get conceitos
+    aux_controller = get_controller()
+    dic_conceito = aux_controller.get_list_conceitos()
+
     #Sort by timestamp desc
     events_list_sorted = sorted(events_list, key=lambda d: d['timestamp'], reverse = True)  
-            
-    return render_template('events.html', events = events_list_sorted, sessionid=sessionid)
+
+    return render_template('events.html', events = events_list_sorted, sessionid=sessionid, dic_conceito=dic_conceito)
 
 
 @dashboard.route('/metrica-acc/<sessionid>')
@@ -145,19 +151,79 @@ def metrica_acc(sessionid):
     '''
     Calcula a metrica ACC.
     '''
-    username = util.get_user_and_password()["username"]
 
-    return render_template("metrica-acc.html", aluno=username ,title='Métrica de Aquisição de Conceitos-Chaves (ACC)')
+    try:
+        controller = get_controller()
+        username = controller.get_user_from_sessionid(sessionid)
 
+        #get conceitos
+        lista_conceitos = []
+        for dic_conceito in controller.get_list_conceitos():
+            print(dic_conceito)
+            lista_conceitos.append(dic_conceito['nome'])
 
-@dashboard.route('/vsr/<sessionid>')
+        #genereted metrica ACC
+        tabela_acc = controller.calcular_metrica_acc(username, lista_conceitos)['metrica_acc']
+        for dic_conceito in controller.get_list_conceitos():
+            tabela_acc[str(dic_conceito['nome'])] = tabela_acc[str(dic_conceito['id'])]
+            del tabela_acc[str(dic_conceito['id'])]
+
+        LOG.debug(tabela_acc)
+
+        return render_template("metrica-acc.html", aluno=username, tabela_acc = tabela_acc, lista_conceitos=lista_conceitos, title='Métrica de Aquisição de Conceitos-Chaves (ACC)')
+
+    except Exception as e:
+        LOG.error(e.args, exc_info=True)
+        return render_template("error.html",
+                           title='Error',
+                           error=e.args)
+
+@dashboard.route('/vsr/<sessionid>', methods = ['POST'])
 def vsr(sessionid):
     '''
     Escala de Verificação de Similaridade de Respostas (VSR).
     '''
-    username = util.get_user_and_password()["username"]
 
-    return render_template("vsr.html", aluno=username ,title='Escala de Verificação de Similaridade de Respostas (VSR)')
+    # Check if request is json and contains all the required fields
+    required_fields = ["conceitos"]
+
+    error = {}
+
+    if not request.form or not (set(required_fields).issubset(request.form)):
+        LOG.error("Erro request, field conceitos is not present.", exc_info=True)
+        return render_template("error.html",
+                           title='Error',
+                           error="Erro request, field conceitos is not present.")
+
+    try:
+        controller = get_controller()
+        username = controller.get_user_from_sessionid(sessionid)
+
+        #get list from atividades
+        lista_atividades = controller.get_list_all_atividades()[:-2]
+
+        #get conceito
+        nome_conceito = request.form['conceitos']
+        LOG.debug(nome_conceito)
+
+        #genereted metrica ACC
+        vsr = controller.gerar_vsr(username, lista_atividades, nome_conceito)['message']['vsr']
+
+        # altering the first column of last raw from number where value is number for one string 'TC', because this is correct presentation according VSR.
+        vsr[-1][0] = "TC"
+        LOG.debug(vsr[-1][0])
+
+        #getting length raw from table vsr, because it's necessary inform the number of questões
+        length = len(vsr[1]) - 2
+
+        return render_template("vsr.html", aluno=username, vsr=vsr, length=length,
+                               title='Escala de Verificação de Similaridade de Respostas (VSR)')
+
+    except Exception as e:
+        LOG.error(e.args, exc_info=True)
+        return render_template("error.html",
+                           title='Error',
+                           error=e.args)
 
 
 
@@ -203,4 +269,11 @@ def _format_event(event):
 
     return(event)
 
-    
+
+def get_controller():
+    # Read username_clientid and password_apikey
+    with open('tmp/data.json') as json_file:
+        data = json.load(json_file)
+
+    events_controller = controller.EventsController(data["username_clientid"], data["password_apikey"])
+    return events_controller

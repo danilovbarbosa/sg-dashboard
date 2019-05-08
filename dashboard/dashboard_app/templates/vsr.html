@@ -11,89 +11,81 @@
 
 <div class="container">
 
-<div class="row">
+    <div class="row">
 
-	<div class="col-md-12 col-sm-12">
+        <div class="col-md-12 col-sm-12">
 
-	<h1>Escala de Verificação de Similaridade de Respostas (VSR)</h1>
+            <h1>Escala de Verificação de Similaridade de Respostas (VSR)</h1>
 
-	<h3>Aluno: {{aluno}}</h3>
+            <h3>Aluno: {{aluno}}</h3>
 
-	<br />
+            <br/>
 
-	<!--<button class="btn btn-primary" onClick="location.reload()" type="button">Refresh</button>-->
-	<!-- Trigger/Open The Modal -->
-	<button id="btnConfigVSR" class="btn btn-primary" onClick="" type="button">Configuar VSR</button>
+            <!--<button class="btn btn-primary" onClick="location.reload()" type="button">Refresh</button>-->
+            <!-- Trigger/Open The Modal -->
+            <button id="btnGerarGrafico" class="btn btn-primary" onClick="" type="button">Gerar gráfico</button>
 
-	<!-- The Modal -->
-	<div id="modalVSR" class="modal">
+            <!-- The Modal -->
+            <div id="modalGrafico" class="modal">
 
-	  <!-- Modal content -->
-	  <div class="modal-content">
-		<div class="modal-header">
-		  <span class="close">&times;</span>
-		  <h2>Verificar Similaridade de Respostas (VSR)</h2>
-		</div>
-		<div class="modal-body">
-		  <p>Some text in the Modal Body</p>
-		  <p>Some other text...</p>
-		</div>
-		<div class="modal-footer">
-			<button id="btnVSR" class="btn btn-primary" onClick="" type="button">Verificar</button>
-		</div>
-	  </div>
+                <!-- Modal content -->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <span class="close">&times;</span>
+                        <h2>Grafico a partir dos dados da VSR </h2>
+                    </div>
+                    <div class="modal-body">
+                        <p>Some text in the Modal Body</p>
+                        <p>Some other text...</p>
+                    </div>
+                    <!--<div class="modal-footer">-->
+                    <!--<button id="btnVSR" class="btn btn-primary" onClick="" type="button">Verificar</button>-->
+                    <!--</div>-->
+                </div>
 
-	</div>
+            </div>
 
-	<br /> <br />
+            <br/> <br/>
 
-	<table id="overview" class="table">
-			  <thead>
-			    <tr>
-							<th>Id da questão</th>
-			        <th>Tempo</th>
-			        <th>Nota</th>
-			        <!-- <th>Update</th>
-			        <th>Which lix</th>
-			        <th>Lix saved</th>
-			        <th>Lix required</th>
-			        <th>Seconds used</th>
-			        <th>Seconds required</th> -->
-			    </tr>
-			    </thead>
-		    <tbody>
+            <table id="overview" class="table">
+                <thead>
+                <tr>
+                    <th>Aluno/Jogador</th>
+                    {% for num_questao in range(length) %}
+                        <td> Questão</td>
+                    {% endfor %}
 
-		    {% for event in events %}
-			<tr>
-					<td>{{ event["id_questao"] }}</td>
-					<td>{{ event["timestamp"] }}</td>
-			    <td>{{ event["nota"] }}</td>
-			    <!-- <td>{{ event["update_string"] }}</td>
-			    <td>{{ event["which_lix"]}}</td>
-			    <td>{{ event["result"]["lix_saved"]}}</td>
-			    <td>{{ event["result"]["lix_required"]}}</td>
-			    <td>{{ event["result"]["seconds_used"]}}</td>
-			    <td>{{ event["result"]["seconds_required"]}}</td> -->
-			</tr>
-		  {% endfor %}
+                    <td>TL</td>
 
-		    </tbody>
+                </tr>
+                </thead>
+                <tbody>
 
-		 </table>
+                {% for linha in vsr %}
+                <tr>
+                    {% for item in linha %}
+                    <td>{{ item }}</td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
 
-	</div><!--/col-md-12-->
+                </tbody>
 
-</div><!--/row-->
+            </table>
+
+        </div><!--/col-md-12-->
+
+    </div><!--/row-->
 
 </div><!--/container-->
 
 
 <script>
 // Get the modal
-var modal = document.getElementById('modalVSR');
+var modal = document.getElementById('modalGrafico');
 
 // Get the button that opens the modal
-var btn = document.getElementById("btnConfigVSR");
+var btn = document.getElementById("btnGerarGrafico");
 
 // Get the <span> element that closes the modal
 var span = document.getElementsByClassName("close")[0];
@@ -114,8 +106,11 @@ window.onclick = function(event) {
     modal.style.display = "none";
   }
 }
-</script>
 
+
+
+
+</script>
 
 
 {% endblock %}

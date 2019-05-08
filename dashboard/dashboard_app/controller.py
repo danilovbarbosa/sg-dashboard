@@ -4,7 +4,8 @@ of the application when called by the views.
 '''
 
 #Make REST calls
-import requests 
+import requests
+import json
 
 # Exceptions and errors
 from requests import RequestException
@@ -12,7 +13,7 @@ from simplejson.decoder import JSONDecodeError
 import simplejson
 
 # Configuration
-from config_sample import GAMEEVENTS_SERVICE_ENDPOINT, USERPROFILE_SERVICE_ENDPOINT
+from config_sample import GAMEEVENTS_SERVICE_ENDPOINT, USERPROFILE_SERVICE_ENDPOINT, LEARNINGANALYSIS_SERVICE_ENDPOINT
 
 #Logging
 from logging import getLogger
@@ -208,3 +209,120 @@ class EventsController:
             username = "<unknown>"       
         
         return(username)
+
+    def set_notas_for_learning_analisys(self, sessionid, nome_aluno):
+        eventos = self.get_events(sessionid)
+        id_habilidade_mundo = sessionid
+        for event in eventos:
+            id_atividade = self.get_id_atividade(nome_aluno, str(id_habilidade_mundo))['id_atividade']
+            LOG.debug(id_atividade)
+            self.set_nota(int(id_atividade), int(event["id_questao"]), event["nota"])
+
+
+
+    # #Def for test
+    # def criar_questoes(self, quesito, tipo_questao):
+    #     '''
+    #     Def for test
+    #     :param quesito:
+    #     :param tipo_questao:
+    #     :return:
+    #     '''
+    #     aux_conceitos_chave= ["alfa", "beta", "gama", "delta"]
+    #     index = [0, 1, 2, 3, 0, 1, 2, 3, 0, 1]
+    #
+    #     list_questoes = []
+    #     for i in range(10):
+    #         aux_dic = {}
+    #         aux_dic['quesito'] = quesito + str(i)
+    #         aux_dic['tipoDeQuestao'] = tipo_questao
+    #         aux_dic['conceitoChave'] = aux_conceitos_chave[index[i]]
+    #         list_questoes.append(aux_dic)
+    #
+    #     return list_questoes
+    # #Def for test
+    # def criar_e_enviar_atividade_para_service(self):
+    #     '''
+    #     Def for test
+    #     :param quesito:
+    #     :param tipo_questao:
+    #     :return:
+    #     '''
+    #     url = LEARNINGANALYSIS_SERVICE_ENDPOINT + '/atividades'
+    #     payload = {'some': 'data'}
+    #     headers = {'content-type': 'application/json'}
+    #
+    #     # atividades = []
+    #     aux_dic = {}
+    #     peso = 1
+    #
+    #     for i in range(5):
+    #         questoes = self.criar_questoes(str(i), 'ordenacao')
+    #         aux_dic = {}
+    #         aux_dic['nome'] = "Joao e maria"
+    #         aux_dic['questoes'] = questoes
+    #         aux_dic['peso'] = peso
+    #         aux_dic['aluno'] = 'danilo'
+    #         aux_dic['id_habilidade_mundo'] = peso
+    #
+    #         peso+=1
+    #         print(requests.post(url, data=json.dumps(aux_dic), headers=headers).json())
+
+    def get_id_atividade(self, aluno, id_habilidade_mundo):
+        url = LEARNINGANALYSIS_SERVICE_ENDPOINT + '/' + aluno + '/atividades/' + id_habilidade_mundo
+        # payload = {'nota': nota}
+        headers = {'content-type': 'application/json'}
+
+        r = requests.get(url)
+        return r.json()['message']
+
+
+
+    def set_nota(self, id_atividade, quesito, nota):
+        url = LEARNINGANALYSIS_SERVICE_ENDPOINT + '/atividade/' + id_atividade + '/questao/' + quesito
+        print(url)
+        payload = {'nota': nota}
+        headers = {'content-type': 'application/json'}
+
+        return requests.post(url, data=json.dumps(payload), headers=headers).json()
+
+    def calcular_metrica_acc(self, aluno, lista_conceitos):
+        url = LEARNINGANALYSIS_SERVICE_ENDPOINT + '/' + aluno + '/calcular_metrica_acc'
+        print(url)
+        payload = {'lista_conceitos': lista_conceitos}
+        headers = {'content-type': 'application/json'}
+
+        r = requests.get(url, data=json.dumps(payload), headers=headers)
+        return r.json()['message']
+
+
+    def get_list_conceitos(self):
+        url = LEARNINGANALYSIS_SERVICE_ENDPOINT + '/conceitos'
+        headers = {'content-type': 'application/json'}
+
+        r = requests.get(url)
+        return r.json()
+
+    def get_list_atividades(self, nome_aluno):
+        url = LEARNINGANALYSIS_SERVICE_ENDPOINT + '/' + nome_aluno + '/atividades'
+        headers = {'content-type': 'application/json'}
+
+        r = requests.get(url)
+        return r.json()
+
+    def get_list_all_atividades(self):
+        url = LEARNINGANALYSIS_SERVICE_ENDPOINT + '/atividades'
+        headers = {'content-type': 'application/json'}
+
+        r = requests.get(url)
+        return r.json()
+
+
+    def gerar_vsr(self, aluno, lista_atividades, conceito_chave):
+        url = LEARNINGANALYSIS_SERVICE_ENDPOINT + '/' + aluno + '/verificar_similaridade_respostas'
+        print(url)
+        payload = {'lista_atividades': lista_atividades, "conceito_chave": conceito_chave}
+        headers = {'content-type': 'application/json'}
+
+        r = requests.get(url, data=json.dumps(payload), headers=headers)
+        return r.json()

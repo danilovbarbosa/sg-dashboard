@@ -13,6 +13,8 @@ SECRET_KEY = 'heytheredonottrytomesswithmemister2'
 
 GAMEEVENTS_SERVICE_ENDPOINT = 'http://localhost:5000/v1'
 USERPROFILE_SERVICE_ENDPOINT = 'http://localhost:5002/v1'
+LEARNINGANALYSIS_SERVICE_ENDPOINT = 'http://localhost:5003/v1'
+
 
 
 # Hard-code disabling CDN support:
